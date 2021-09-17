@@ -1,5 +1,6 @@
 package com.example.demo.student
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -8,12 +9,29 @@ import java.time.LocalDate
 @Service
 class StudentService {
 
-    fun readyStudentList(): ArrayList<Student> {
-        val list: ArrayList<Student> = ArrayList()
-        list.add(Student(1, "Ankur Jana", 23, LocalDate.MAX, "ankurjana905@gmail.com"))
-        list.add(Student(1, "Ankur Jana", 23, LocalDate.MAX, "ankurjana905@gmail.com"))
-        list.add(Student(1, "Ankur Jana", 23, LocalDate.MAX, "ankurjana905@gmail.com"))
-        list.add(Student(1, "Ankur Jana", 23, LocalDate.MAX, "ankurjana905@gmail.com"))
-        return list
+    @Autowired
+    lateinit var studentRepository: StudentRepository
+
+    fun readyStudentList(): MutableList<Student> {
+        return studentRepository.findAll()
     }
+
+    fun addNewStudent(student: Student) {
+        val list = studentRepository.findStudentByEmail(student.email)
+        if (list.isPresent) {
+            throw IllegalAccessException("Email already present")
+        }
+        println(student)
+        studentRepository.save(student)
+    }
+
+    fun updateStudent(id: String) {
+
+        val student = studentRepository.findById(id)
+        if (student.isPresent) {
+            studentRepository.save(student.get())
+        }
+        println(student)
+    }
+
 }
